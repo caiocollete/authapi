@@ -39,4 +39,9 @@ public class authController {
         */
         return keyService.genToken(time);
     }
+
+    @GetMapping("users")
+    public ResponseEntity<Object> Users() {
+        return userService.getUsers();
+    }
 }

@@ -3,6 +3,7 @@ package com.cc.authapi.application;
 import com.cc.authapi.domain.User;
 import com.cc.authapi.repository.IKeyRepository;
 import com.cc.authapi.repository.IUserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -92,4 +93,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public ResponseEntity<Object> getUsers() {
+        var response = findAll();
+        if(response.isEmpty())
+            return ResponseEntity.badRequest().body("No users found");
+        return ResponseEntity.ok(response);
+    }
 }
