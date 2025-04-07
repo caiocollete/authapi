@@ -1,4 +1,4 @@
-﻿package com.cc.authapi.controllers;
+package com.cc.authapi.controllers;
 
 import com.cc.authapi.application.KeyService;
 import com.cc.authapi.application.UserService;

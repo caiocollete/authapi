@@ -1,4 +1,4 @@
-﻿package com.cc.authapi.domain;
+package com.cc.authapi.domain;
 
 import jakarta.persistence.*;
 import java.util.Date;
