@@ -19,7 +19,11 @@ Uma API REST de autenticação desenvolvida com Spring Boot, Hibernate e Spring 
 ```
 com.cc.authapi
 ├── application
+│   └── KeyService.java
 │   └── UserService.java
+├── config
+│   └── PasswordConfig.java
+│   └── SecurityConfig.java
 ├── controllers
 │   └── AuthController.java
 ├── domain
