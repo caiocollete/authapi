@@ -23,7 +23,7 @@ public class User {
 
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date requestDate;
+    private Date lastRequestDate;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "key_id", referencedColumnName = "id")
@@ -34,20 +34,20 @@ public class User {
 
 
     // register
-    public User(Long id, String username, String email, String password, Date requestDate, UUID key) {
+    public User(Long id, String username, String email, String password, Date lastRequestDate, UUID key) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.requestDate = requestDate;
+        this.lastRequestDate = lastRequestDate;
         this.key = new Key(key);
     }
 
-    public User(String user, String email, String password, Date requestDate) {
+    public User(String user, String email, String password, Date lastRequestDate) {
         this.username = user;
         this.email = email;
         this.password = password;
-        this.requestDate = requestDate;
+        this.lastRequestDate = lastRequestDate;
     }
 
     public void setPassword(String password) {
@@ -55,8 +55,8 @@ public class User {
     }
 
     // login
-    public User(Date requestDate, String password, String user) {
-        this.requestDate = requestDate;
+    public User(Date lastRequestDate, String password, String user) {
+        this.lastRequestDate = lastRequestDate;
         this.password = password;
         this.username = user;
     }
@@ -81,12 +81,12 @@ public class User {
         return password;
     }
 
-    public Date getRequestDate() {
-        return requestDate;
+    public Date getLastRequestDate() {
+        return lastRequestDate;
     }
 
-    public void setRequestDate(Date requestDate) {
-        this.requestDate = requestDate;
+    public void setLastRequestDate(Date requestDate) {
+        this.lastRequestDate = requestDate;
     }
 
     public Key getKey() {
