@@ -40,7 +40,7 @@ public class AuthController {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @PostMapping("/gen")
+    @PostMapping("gen")
     public ResponseEntity<?> generate(@RequestParam String time) {
         ApiResponse<Key> response = keyService.generateKey(time);
 
