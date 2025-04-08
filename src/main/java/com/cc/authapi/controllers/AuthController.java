@@ -2,9 +2,13 @@ package com.cc.authapi.controllers;
 
 import com.cc.authapi.application.KeyService;
 import com.cc.authapi.application.UserService;
+import com.cc.authapi.domain.ApiResponse;
+import com.cc.authapi.domain.Key;
 import com.cc.authapi.domain.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("v1")
@@ -20,21 +24,40 @@ public class AuthController {
 
     @PutMapping("login")
     public ResponseEntity<Object> LoginUser(@RequestBody User user) {
-        return userService.login(user);
+        ApiResponse<User> response = userService.login(user);
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
     }
 
     @PostMapping("register")
     public ResponseEntity<Object> RegisterUser(@RequestBody User user) {
-        return userService.register(user);
+        ApiResponse<User> response = userService.register(user);
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
     }
 
     @PostMapping("gen")
-    public ResponseEntity<Object> GenerateToken(@RequestParam("time") String time) {
-        return keyService.genToken(time);
+    public ResponseEntity<?> generate(@RequestParam String time) {
+        ApiResponse<Key> response = keyService.generateKey(time);
+
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
     }
+
 
     @GetMapping("users")
     public ResponseEntity<Object> Users() {
-        return userService.getUsers();
+        ApiResponse<List<User>> response = userService.getUsers();
+        if (response.isSuccess()) {
+            return ResponseEntity.ok(response);
+        }
+        return ResponseEntity.badRequest().body(response);
     }
 }

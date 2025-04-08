@@ -1,5 +1,7 @@
 package com.cc.authapi.application;
 
+import com.cc.authapi.domain.ApiResponse;
+import com.cc.authapi.domain.Key;
 import com.cc.authapi.domain.User;
 import com.cc.authapi.repository.IKeyRepository;
 import com.cc.authapi.repository.IUserRepository;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -29,46 +32,62 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-    public ResponseEntity<Object> login(User userAttemptLogin) {
+    public ApiResponse<User> login(User userAttemptLogin) {
         User userDb = findByUsername(userAttemptLogin.getUsername()); // procura user pelo username na db
         if (userDb == null)
-            return ResponseEntity.badRequest().body("Invalid username");
+            return new ApiResponse<>(false,"Invalid username",null);
         if(passwordEncoder.matches(userAttemptLogin.getPassword(), userDb.getPassword())) {
             if(!userDb.getKey().isExpired()){
                 userDb.setLastRequestDate(new Date());
                 userRepository.save(userDb);
-                return ResponseEntity.ok("Sucessfully logged in");
+                userDb.setPassword(null); // remove a senha para retornar
+                return new ApiResponse<>(true,"Successfully logged in", userDb);
             }
-            return ResponseEntity.badRequest().body("Your license was expired");
+            return new ApiResponse<>(false,"Your license was expired",null);
         }
-        return ResponseEntity.badRequest().body("Your credential was incorrect");
+        return new ApiResponse<>(false,"Your credentials were incorrect",null);
     }
 
-    public ResponseEntity<Object> register(User user) {
+    private ApiResponse<User> validateRegister(User user) {
         if (user.getEmail() == null || user.getUsername() == null || user.getPassword() == null)
-            return ResponseEntity.badRequest().body("Please complete all fields");
+            return new ApiResponse<>(false,"Please complete all fields", null);
 
         if (user.getPassword().length() < 6)
-            return ResponseEntity.badRequest().body("Password must be at least 6 characters");
+            return new ApiResponse<>(false,"Password must be at least 6 characters",null);
 
         if (findByUsername(user.getUsername()) != null)
-            return ResponseEntity.badRequest().body("Username already exists");
+            return new ApiResponse<>(false,"Username already exists",null);
 
         if (findByEmail(user.getEmail()) != null)
-            return ResponseEntity.badRequest().body("Email already exists");
+            return new ApiResponse<>(false,"Email already exists",null);
+
+        return null;
+    }
+
+    private ApiResponse<Key> validateKey(Optional<Key> optionalKey) {
+        if (optionalKey.isEmpty())
+            return new ApiResponse<>(false,"Your key isn't valid",null);
+        var key = optionalKey.get();
+        if (key.isExpired())
+            return new ApiResponse<>(false,"Your key is expired",null);
+        if (key.isUse())
+            return new ApiResponse<>(false,"Your key was already used",null);
+
+        return new ApiResponse<>(true,"Your key was valid",key);
+    }
+
+    public ApiResponse<User> register(User user) {
+        ApiResponse<User> validation = validateRegister(user);
+
+        if(!validation.isSuccess())
+            return validation;
 
         var optionalKey = keyRepository.findById(user.getKey().getId());
+        var keyValidation = validateKey(optionalKey);
+        if (!keyValidation.isSuccess())
+            return new ApiResponse<>(false, keyValidation.getMessage(), null);
 
-        if (optionalKey.isEmpty())
-            return ResponseEntity.badRequest().body("Your key isn't valid");
-
-        var key = optionalKey.get();
-
-        if (key.isExpired())
-            return ResponseEntity.badRequest().body("Your key is expired");
-
-        if (key.isUse())
-            return ResponseEntity.badRequest().body("Your key was already used");
+        var key = keyValidation.getData();
 
         // Marca a key como usada
         key.setUse(true);
@@ -80,7 +99,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
-        return ResponseEntity.ok("Successfully registered");
+        user.setPassword(null);
+        return new ApiResponse<>(true,"Successfully registered", user);
     }
 
 
@@ -92,10 +112,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public ResponseEntity<Object> getUsers() {
-        var response = findAll();
+    public ApiResponse<List<User>> getUsers() {
+        List<User> response = findAll();
         if(response.isEmpty())
-            return ResponseEntity.badRequest().body("No users found");
-        return ResponseEntity.ok(response);
+            return new ApiResponse<>(false,"No users found",null);
+        return new ApiResponse<>(true,"Users found",response);
     }
 }

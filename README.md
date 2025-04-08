@@ -166,7 +166,11 @@ Evitar expor entidades diretamente nos endpoints (ex: UserRegisterRequest, UserL
 🧪 3. Validações com Bean Validation
 Anotações como @NotNull, @Email, @Size, etc. usando @Valid nos controllers.
 
-🧼 4. Padronizar respostas com uma classe ApiResponse
+---
+
+## 📄 Licença
+
+Projeto com fins educacionais. Sinta-se livre para modificar e utilizar como quiser.
 
 ---
 

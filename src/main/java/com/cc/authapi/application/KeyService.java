@@ -1,5 +1,6 @@
 package com.cc.authapi.application;
 
+import com.cc.authapi.domain.ApiResponse;
 import com.cc.authapi.domain.Key;
 import com.cc.authapi.repository.IKeyRepository;
 import org.springframework.http.ResponseEntity;
@@ -17,37 +18,38 @@ public class KeyService {
         this.keyRepository = keyRepository;
     }
 
-    public ResponseEntity<Object> genToken(String time) {
+    private Date parseExpiration(String time) throws IllegalArgumentException {
+        if (time.equalsIgnoreCase("lf")) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.YEAR, 100);
+            return calendar.getTime();
+        } else if (time.endsWith("d")) {
+            int days = Integer.parseInt(time.replace("d", ""));
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, days);
+            return calendar.getTime();
+        }
+        throw new IllegalArgumentException("Invalid time format.");
+    }
+
+
+    public ApiResponse<Key> generateKey(String time) {
         if (time == null || time.isBlank()) {
-            return ResponseEntity.badRequest().body("Insert a valid time format (e.g. '3d' or 'lf')");
+            return new ApiResponse<>(false, "Formato inválido. Use '3d' ou 'lf'", null);
         }
 
         try {
-            Date expirationDate;
-
-            if (time.equalsIgnoreCase("lf")) {
-                // 100 anos no futuro
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.YEAR, 100);
-                expirationDate = calendar.getTime();
-            } else if (time.endsWith("d")) {
-                int days = Integer.parseInt(time.replace("d", ""));
-                Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.DAY_OF_YEAR, days);
-                expirationDate = calendar.getTime();
-            } else {
-                return ResponseEntity.badRequest().body("Invalid time format. Use 'Xd' for days or 'lf' for lifetime.");
-            }
-
-            Key newKey = new Key(expirationDate);
-            keyRepository.save(newKey);
-
-            return ResponseEntity.ok(newKey);
-
-        } catch (NumberFormatException e) {
-            return ResponseEntity.badRequest().body("Invalid time format. Use format like '3d' or 'lf'");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error generating key");
+            Date expiration = parseExpiration(time);
+            Key key = new Key(expiration);
+            keyRepository.save(key);
+            return new ApiResponse<>(true, "Chave gerada com sucesso", key);
+        }
+        catch (IllegalArgumentException e) {
+            return new ApiResponse<>(false, e.getMessage(), null);
+        }
+        catch (Exception e) {
+            return new ApiResponse<>(false, "Erro interno ao gerar chave", null);
         }
     }
+
 }
