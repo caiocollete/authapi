@@ -1,4 +1,4 @@
-﻿package com.cc.authapi.application;
+package com.cc.authapi.application;
 
 import com.cc.authapi.domain.Key;
 import com.cc.authapi.repository.IKeyRepository;

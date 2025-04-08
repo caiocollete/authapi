@@ -1,4 +1,4 @@
-﻿package com.cc.authapi.application;
+package com.cc.authapi.application;
 
 import com.cc.authapi.domain.User;
 import com.cc.authapi.repository.IKeyRepository;
@@ -35,7 +35,7 @@ public class UserService {
             return ResponseEntity.badRequest().body("Invalid username");
         if(passwordEncoder.matches(userAttemptLogin.getPassword(), userDb.getPassword())) {
             if(!userDb.getKey().isExpired()){
-                userDb.setRequestDate(userAttemptLogin.getRequestDate());
+                userDb.setLastRequestDate(new Date());
                 userRepository.save(userDb);
                 return ResponseEntity.ok("Sucessfully logged in");
             }
@@ -75,7 +75,7 @@ public class UserService {
         keyRepository.save(key);
 
         // Associa a key ao usuário e salva
-        user.setRequestDate(new Date());
+        user.setLastRequestDate(new Date());
         user.setKey(key);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -92,4 +92,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public ResponseEntity<Object> getUsers() {
+        var response = findAll();
+        if(response.isEmpty())
+            return ResponseEntity.badRequest().body("No users found");
+        return ResponseEntity.ok(response);
+    }
 }

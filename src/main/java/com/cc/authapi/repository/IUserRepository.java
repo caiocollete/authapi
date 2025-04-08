@@ -1,4 +1,4 @@
-﻿package com.cc.authapi.repository;
+package com.cc.authapi.repository;
 
 import com.cc.authapi.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;

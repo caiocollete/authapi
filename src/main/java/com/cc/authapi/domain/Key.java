@@ -1,4 +1,4 @@
-﻿package com.cc.authapi.domain;
+package com.cc.authapi.domain;
 
 import jakarta.persistence.*;
 import java.util.Date;
@@ -22,20 +22,19 @@ public class Key {
 
     public Key() {}
 
-    // Construtor para criação
+    // to create
     public Key(Date expires) {
         this.expires = expires;
         this.use = false;
     }
 
-    // Construtor para carga do banco
+    // get do banco
     public Key(UUID id, Date expires, boolean use) {
         this.id = id;
         this.expires = expires;
         this.use = use;
     }
 
-    // Apenas com ID
     public Key(UUID id) {
         this.id = id;
     }

@@ -1,4 +1,4 @@
-﻿package com.cc.authapi.config;
+package com.cc.authapi.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
