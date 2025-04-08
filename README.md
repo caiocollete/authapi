@@ -169,10 +169,4 @@ Anotações como @NotNull, @Email, @Size, etc. usando @Valid nos controllers.
 
 ---
 
-## 📄 Licença
-
-Projeto com fins educacionais. Sinta-se livre para modificar e utilizar como quiser.
-
----
-
 ❤ [Caio Collete](https://github.com/caiocollete)
