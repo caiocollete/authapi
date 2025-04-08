@@ -33,10 +33,6 @@ public class authController {
 
     @PostMapping("gen")
     public ResponseEntity<Object> GenerateToken(@RequestParam("time") String time) {
-        /* Formatos de tempo (duracao da key)
-        * 1d - 1 dias
-        * lf - LifeTime
-        */
         return keyService.genToken(time);
     }
 
