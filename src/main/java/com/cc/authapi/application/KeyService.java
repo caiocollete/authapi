@@ -2,8 +2,8 @@ package com.cc.authapi.application;
 
 import com.cc.authapi.domain.ApiResponse;
 import com.cc.authapi.domain.Key;
+import com.cc.authapi.dtos.KeyDTO;
 import com.cc.authapi.repository.IKeyRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -33,7 +33,7 @@ public class KeyService {
     }
 
 
-    public ApiResponse<Key> generateKey(String time) {
+    public ApiResponse<KeyDTO> generateKey(String time) {
         if (time == null || time.isBlank()) {
             return new ApiResponse<>(false, "Formato inválido. Use '3d' ou 'lf'", null);
         }
@@ -42,7 +42,7 @@ public class KeyService {
             Date expiration = parseExpiration(time);
             Key key = new Key(expiration);
             keyRepository.save(key);
-            return new ApiResponse<>(true, "Chave gerada com sucesso", key);
+            return new ApiResponse<>(true, "Chave gerada com sucesso", DtosMappers.toKeyDTO(key));
         }
         catch (IllegalArgumentException e) {
             return new ApiResponse<>(false, e.getMessage(), null);

@@ -5,6 +5,8 @@ import com.cc.authapi.application.UserService;
 import com.cc.authapi.domain.ApiResponse;
 import com.cc.authapi.domain.Key;
 import com.cc.authapi.domain.User;
+import com.cc.authapi.dtos.KeyDTO;
+import com.cc.authapi.dtos.UserWithKeyDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +26,7 @@ public class AuthController {
 
     @PutMapping("login")
     public ResponseEntity<Object> LoginUser(@RequestBody User user) {
-        ApiResponse<User> response = userService.login(user);
+        ApiResponse<UserWithKeyDTO> response = userService.login(user);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
         }
@@ -33,7 +35,7 @@ public class AuthController {
 
     @PostMapping("register")
     public ResponseEntity<Object> RegisterUser(@RequestBody User user) {
-        ApiResponse<User> response = userService.register(user);
+        ApiResponse<UserWithKeyDTO> response = userService.register(user);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
         }
@@ -42,7 +44,7 @@ public class AuthController {
 
     @PostMapping("gen")
     public ResponseEntity<?> generate(@RequestParam String time) {
-        ApiResponse<Key> response = keyService.generateKey(time);
+        ApiResponse<KeyDTO> response = keyService.generateKey(time);
 
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -54,7 +56,7 @@ public class AuthController {
 
     @GetMapping("users")
     public ResponseEntity<Object> Users() {
-        ApiResponse<List<User>> response = userService.getUsers();
+        ApiResponse<List<UserWithKeyDTO>> response = userService.getUsers();
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
         }

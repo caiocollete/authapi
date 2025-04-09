@@ -3,12 +3,13 @@ package com.cc.authapi.application;
 import com.cc.authapi.domain.ApiResponse;
 import com.cc.authapi.domain.Key;
 import com.cc.authapi.domain.User;
+import com.cc.authapi.dtos.UserWithKeyDTO;
 import com.cc.authapi.repository.IKeyRepository;
 import com.cc.authapi.repository.IUserRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,19 +33,20 @@ public class UserService {
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-    public ApiResponse<User> login(User userAttemptLogin) {
+    public ApiResponse<UserWithKeyDTO> login(User userAttemptLogin) {
         User userDb = findByUsername(userAttemptLogin.getUsername()); // procura user pelo username na db
         if (userDb == null)
             return new ApiResponse<>(false,"Invalid username",null);
-        if(passwordEncoder.matches(userAttemptLogin.getPassword(), userDb.getPassword())) {
-            if(!userDb.getKey().isExpired()){
+        if (passwordEncoder.matches(userAttemptLogin.getPassword(), userDb.getPassword())) {
+            if (!userDb.getKey().isExpired()) {
                 userDb.setLastRequestDate(new Date());
                 userRepository.save(userDb);
-                userDb.setPassword(null); // remove a senha para retornar
-                return new ApiResponse<>(true,"Successfully logged in", userDb);
+
+                return new ApiResponse<>(true, "Successfully logged in", DtosMappers.toUserWithKeyDTO(userDb));
             }
-            return new ApiResponse<>(false,"Your license was expired",null);
+            return new ApiResponse<>(false, "Your license was expired", null);
         }
+
         return new ApiResponse<>(false,"Your credentials were incorrect",null);
     }
 
@@ -61,7 +63,7 @@ public class UserService {
         if (findByEmail(user.getEmail()) != null)
             return new ApiResponse<>(false,"Email already exists",null);
 
-        return null;
+        return new ApiResponse<>(true, "Successfully logged in", null);
     }
 
     private ApiResponse<Key> validateKey(Optional<Key> optionalKey) {
@@ -76,11 +78,11 @@ public class UserService {
         return new ApiResponse<>(true,"Your key was valid",key);
     }
 
-    public ApiResponse<User> register(User user) {
+    public ApiResponse<UserWithKeyDTO> register(User user) {
         ApiResponse<User> validation = validateRegister(user);
 
         if(!validation.isSuccess())
-            return validation;
+            return new ApiResponse<>(validation.isSuccess(), validation.getMessage(), null);
 
         var optionalKey = keyRepository.findById(user.getKey().getId());
         var keyValidation = validateKey(optionalKey);
@@ -99,8 +101,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
 
-        user.setPassword(null);
-        return new ApiResponse<>(true,"Successfully registered", user);
+        return new ApiResponse<>(true,"Successfully registered", DtosMappers.toUserWithKeyDTO(user));
     }
 
 
@@ -112,10 +113,16 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public ApiResponse<List<User>> getUsers() {
+    public ApiResponse<List<UserWithKeyDTO>> getUsers() {
         List<User> response = findAll();
+
         if(response.isEmpty())
             return new ApiResponse<>(false,"No users found",null);
-        return new ApiResponse<>(true,"Users found",response);
+
+        List<UserWithKeyDTO> userList = new ArrayList<>();
+        for(User user : response) {
+            userList.add(DtosMappers.toUserWithKeyDTO(user));
+        }
+        return new ApiResponse<>(true,"Users found",userList);
     }
 }
