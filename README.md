@@ -30,6 +30,10 @@ com.cc.authapi
 │   ├── User.java
 │   ├── Key.java
 │   └── ApiResponse.java
+├── dtos
+│   ├── KeyDTO.java
+│   ├── UserDTO.java
+│   └── UserWithKeyDTO.java
 ├── repository
 │   ├── IUserRepository.java
 │   └── IKeyRepository.java
@@ -161,10 +165,7 @@ CREATE TABLE public.users (
 🔐 1. JWT Authentication
 Pra gerar tokens de acesso e proteger endpoints (login → recebe token, token → acessa recursos).
 
-📦 2. DTOs (Data Transfer Objects)
-Evitar expor entidades diretamente nos endpoints (ex: UserRegisterRequest, UserLoginRequest, UserResponse).
-
-🧪 3. Validações com Bean Validation
+🧪 2. Validações com Bean Validation
 Anotações como @NotNull, @Email, @Size, etc. usando @Valid nos controllers.
 
 ---
