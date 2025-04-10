@@ -71,7 +71,10 @@ spring.datasource.password=postgres123
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
+
+auth.bot.key=<your-api-key>
 ```
+ `auth.bot.key`: A chave de api deve ser a mesma que esta sendo enviada pelo header.
 
 3. Instale dependências e rode o projeto:
 

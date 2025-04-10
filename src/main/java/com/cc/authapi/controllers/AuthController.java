@@ -7,6 +7,7 @@ import com.cc.authapi.domain.Key;
 import com.cc.authapi.domain.User;
 import com.cc.authapi.dtos.KeyDTO;
 import com.cc.authapi.dtos.UserWithKeyDTO;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,8 @@ import java.util.List;
 @RequestMapping("v1")
 public class AuthController {
 
+    @Value("${auth.bot.key}")
+    private String botKey;
     private final UserService userService;
     private final KeyService keyService;
 
@@ -43,7 +46,11 @@ public class AuthController {
     }
 
     @PostMapping("gen")
-    public ResponseEntity<?> generate(@RequestParam String time) {
+    public ResponseEntity<?> generate(@RequestHeader("X-Api-Key") String key, @RequestParam String time) {
+        if (key.isBlank() || !botKey.equals(key)) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false,"Unauthorized",null));
+        }
+
         ApiResponse<KeyDTO> response = keyService.generateKey(time);
 
         if (response.isSuccess()) {
@@ -55,7 +62,11 @@ public class AuthController {
 
 
     @GetMapping("users")
-    public ResponseEntity<Object> Users() {
+    public ResponseEntity<Object> Users(@RequestHeader("X-Api-Key") String key) {
+        if (key.isBlank() || !botKey.equals(key)) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(false,"Unauthorized",null));
+        }
+
         ApiResponse<List<UserWithKeyDTO>> response = userService.getUsers();
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
