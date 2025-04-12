@@ -165,10 +165,7 @@ CREATE TABLE public.users (
 
 ## Proximos passos
 
-🔐 1. JWT Authentication
-Pra gerar tokens de acesso e proteger endpoints (login → recebe token, token → acessa recursos).
-
-🧪 2. Validações com Bean Validation
+🧪 1. Validações com Bean Validation
 Anotações como @NotNull, @Email, @Size, etc. usando @Valid nos controllers.
 
 ---
